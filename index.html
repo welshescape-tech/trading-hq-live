@@ -19,8 +19,57 @@ function num(s){if(s==null||String(s).trim()==='')return NaN;let v=String(s).rep
 function draw(){const c=$('chart'),g=c.getContext('2d'),w=c.width,h=c.height;g.clearRect(0,0,w,h);g.strokeStyle='#30475d';g.beginPath();g.moveTo(42,10);g.lineTo(42,h-25);g.lineTo(w-12,h-25);g.stroke();if(!closed.length)return;let sum=0,pts=[0];for(const x of closed)pts.push(sum+=x.pnl);let lo=Math.min(...pts,0),hi=Math.max(...pts,0);if(lo===hi){lo-=1;hi+=1}g.strokeStyle='#6bd2fa';g.lineWidth=2;g.beginPath();pts.forEach((v,i)=>{let x=42+i/Math.max(1,pts.length-1)*(w-55),y=10+(hi-v)/(hi-lo)*(h-35);i?g.lineTo(x,y):g.moveTo(x,y)});g.stroke();g.fillStyle='#a6b5c8';g.font='12px sans-serif';g.fillText(money(hi),45,12);g.fillText(money(lo),45,h-30)}
 function render(){let pnl=closed.reduce((a,x)=>a+x.pnl,0),wins=closed.filter(x=>x.pnl>0).length,nonzero=closed.filter(x=>x.pnl!==0).length;$('pnl').textContent=closed.length?money(pnl):'—';$('pnl').className='value '+(pnl<0?'bad':'good');$('trades').textContent=closed.length||'—';$('win').textContent=nonzero?(100*wins/nonzero).toFixed(1)+'%':'—';draw();let q=$('filter').value.toLowerCase();let matches=closed.filter(x=>(x.instrument+' '+x.action).toLowerCase().includes(q));$('journal').innerHTML=matches.slice(-150).reverse().map(x=>'<tr><td>'+esc(x.date)+'</td><td>'+esc(x.instrument)+'</td><td>'+esc(x.action)+'</td><td class="'+(x.pnl<0?'bad':'good')+'">'+money(x.pnl)+'</td></tr>').join('')||'<tr><td colspan="4">No matching closed positions</td></tr>';$('count').textContent=matches.length+' matching records; showing latest 150.'}
 function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
-$('csv').addEventListener('change',async e=>{const f=e.target.files[0];if(!f)return;try{const rows=parseCSV((await f.text()).replace(/^\uFEFF/,''));const h=rows.shift().map(x=>x.trim().toLowerCase());const idx=(...terms)=>h.findIndex(x=>terms.some(t=>x===t));const action=idx('action','type'),result=idx('result (gbp)','result','p/l (gbp)','profit/loss','profit / loss','realised p/l','realized p/l');const instrument=idx('name','instrument','ticker','symbol'),date=idx('time','date','created on','execution time');if(action<0||result<0)throw Error('Could not identify Action and Result columns. Please use a Trading 212 History CSV containing closed positions.');closed=rows.filter(r=>/position closed|close position|closed position/i.test(r[action]||'')).map(r=>({date:r[date]||'',instrument:r[instrument]||'Unknown',action:r[action]||'',pnl:num(r[result])})).filter(x=>Number.isFinite(x.pnl));closed.sort((a,b)=>{let da=Date.parse(a.date),db=Date.parse(b.date);return Number.isFinite(da)&&Number.isFinite(db)?da-db:0});$('status').textContent=f.name+' · '+rows.length+' records · '+closed.length+' closed positions identified. Check totals against Trading 212.';$('pnlNote').textContent='Sum of imported closed-position result column';render()}catch(err){closed=[];render();$('status').textContent='Import error: '+err.message}});
-$('clear').onclick=()=>{closed=[];$('csv').value='';$('status').textContent='Imported data cleared.';render()};$('filter').oninput=render;
+let importRequest = 0;
+$('csv').addEventListener('change', async e => {
+  const file = e.target.files[0];
+  if (!file) return;
+  const request = ++importRequest;
+  try {
+    const rows = parseCSV((await file.text()).replace(/^\uFEFF/, ''));
+    if (request !== importRequest) return;
+    const headers = (rows.shift() || []).map(value => value.trim().toLowerCase());
+    const index = (...names) => names.map(name => headers.indexOf(name)).find(i => i >= 0) ?? -1;
+    const recordType = index('record type');
+    const isCFD = recordType >= 0;
+    const action = isCFD ? recordType : index('action', 'type');
+    const result = isCFD
+      ? index('total result (account currency)')
+      : index('result (gbp)', 'result', 'p/l (gbp)', 'profit/loss', 'profit / loss', 'realised p/l', 'realized p/l');
+    const currency = index('account currency');
+    const instrument = index('instrument', 'name', 'ticker', 'symbol');
+    const date = isCFD ? index('date closed (utc)') : index('time', 'date', 'created on', 'execution time');
+    if (action < 0 || result < 0 || (isCFD && currency < 0)) {
+      throw Error('Please choose a Trading 212 history CSV with closed-position results.');
+    }
+    const positions = rows.filter(row => /position closed|close position|closed position/i.test(row[action] || ''));
+    if (isCFD && positions.some(row => row[currency]?.trim().toUpperCase() !== 'GBP')) {
+      throw Error('This dashboard displays GBP and requires a GBP account export.');
+    }
+    closed = positions.map(row => ({
+      date: row[date] || '',
+      instrument: row[instrument] || 'Unknown',
+      action: row[action] || '',
+      pnl: num(row[result])
+    })).filter(position => Number.isFinite(position.pnl));
+    closed.sort((a, b) => {
+      const aTime = Date.parse(isCFD ? a.date.replace(' ', 'T') + 'Z' : a.date);
+      const bTime = Date.parse(isCFD ? b.date.replace(' ', 'T') + 'Z' : b.date);
+      return Number.isFinite(aTime) && Number.isFinite(bTime) ? aTime - bTime : 0;
+    });
+    const skipped = positions.length - closed.length;
+    $('status').textContent = file.name + ' · ' + rows.length + ' records · ' + closed.length +
+      ' closed positions imported.' + (skipped ? ' Skipped ' + skipped + ' with missing or invalid results.' : '');
+    $('pnlNote').textContent = isCFD ? 'Sum of Total result for closed positions in GBP' : 'Sum of imported closed-position result column';
+    render();
+  } catch (error) {
+    if (request !== importRequest) return;
+    closed = [];
+    $('pnlNote').textContent = 'Import CSV to calculate';
+    render();
+    $('status').textContent = 'Import error: ' + error.message;
+  }
+});
+$('clear').onclick=()=>{importRequest++;closed=[];$('pnlNote').textContent='Import CSV to calculate';$('csv').value='';$('status').textContent='Imported data cleared.';render()};$('filter').oninput=render;
 function risk(){let e=num($('equity').value),p=num($('risk').value),a=num($('entry').value),b=num($('stop').value);if(!Number.isFinite(e)||e<=0||!Number.isFinite(p)||p<=0||!Number.isFinite(a)||!Number.isFinite(b)||a===b){$('riskout').textContent='Enter positive equity and risk, plus different entry and stop prices.';return}let cash=e*p/100;$('riskout').textContent='Maximum planned risk: '+money(cash)+' · Indicative units: '+(cash/Math.abs(a-b)).toFixed(4)}['equity','risk','entry','stop'].forEach(id=>$(id).oninput=risk);
 const key='tradinghq-v1-watch',akey='tradinghq-v1-alerts';function read(k){try{return JSON.parse(localStorage.getItem(k)||'[]')}catch{return []}}function save(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch{}}let watch=read(key),alerts=read(akey);function renderWatch(){$('watch').innerHTML=watch.map((x,i)=>'<tr><td>'+esc(x.symbol)+'</td><td>'+esc(x.asset)+'</td><td><button data-i="'+i+'">Remove</button></td></tr>').join('')||'<tr><td colspan="3">No instruments added</td></tr>';document.querySelectorAll('#watch button').forEach(b=>b.onclick=()=>{watch.splice(+b.dataset.i,1);save(key,watch);renderWatch()})}function renderAlerts(){$('alerts').innerHTML=alerts.map((x,i)=>'<p>'+esc(x.symbol)+' · '+esc(x.target)+' <button data-i="'+i+'">Remove</button></p>').join('')||'No levels added.';document.querySelectorAll('#alerts button').forEach(b=>b.onclick=()=>{alerts.splice(+b.dataset.i,1);save(akey,alerts);renderAlerts()})}
 $('add').onclick=()=>{let symbol=$('symbol').value.trim().toUpperCase();if(!symbol)return;watch.push({symbol,asset:$('asset').value});save(key,watch);$('symbol').value='';renderWatch()};$('addalert').onclick=()=>{let symbol=$('alertsymbol').value.trim().toUpperCase(),target=num($('target').value);if(!symbol||!Number.isFinite(target))return;alerts.push({symbol,target});save(akey,alerts);$('alertsymbol').value='';$('target').value='';renderAlerts()};renderWatch();renderAlerts();draw();
