@@ -1,99 +1,128 @@
 <!doctype html>
-<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#080f1c"><title>Trading HQ | Dashboard</title>
-<style>
-:root{color-scheme:dark;--bg:#080f1c;--panel:#121e30;--line:#293a50;--muted:#a6b5c8;--blue:#6bd2fa;--green:#61d6a4;--red:#ff8190}
-*{box-sizing:border-box}body{margin:0;background:var(--bg);color:#f0f5ff;font:15px/1.5 system-ui,Segoe UI,sans-serif}main{max-width:1250px;margin:auto;padding:24px 16px 60px}header,.flex{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}h1{margin:0;font-size:2rem}h2{font-size:1rem;margin:0 0 12px}p,small,.muted{color:var(--muted)}.pill{border:1px solid #3c5e77;border-radius:20px;padding:5px 11px;color:var(--blue);font-size:.8rem}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:14px;margin:18px 0}.card{background:var(--panel);border:1px solid var(--line);border-radius:15px;padding:18px;min-width:0}.value{font-size:1.75rem;font-weight:750;overflow-wrap:anywhere}.good{color:var(--green)}.bad{color:var(--red)}a{color:#b6d5ff}.market-chart{display:block;width:100%;height:280px;border:0;margin-bottom:.5rem}.notice{border-left:3px solid var(--blue);padding:12px 15px;background:#10263a;border-radius:8px;margin:20px 0}button,input,select{background:#1c3046;color:white;border:1px solid #456078;border-radius:8px;padding:10px;font:inherit}button{cursor:pointer}button:hover{border-color:var(--blue)}input[type=file]{max-width:100%}input[type=number]{width:130px}input[type=text]{width:170px}label{display:inline-flex;align-items:center;gap:8px;flex-wrap:wrap;margin:5px 10px 5px 0}table{border-collapse:collapse;width:100%;font-size:.9rem}th,td{padding:10px 8px;text-align:left;border-bottom:1px solid var(--line)}th{color:var(--muted)}.scroll{overflow:auto}section{margin-top:18px}.two{display:grid;grid-template-columns:repeat(auto-fit,minmax(310px,1fr));gap:14px}canvas{width:100%;height:180px}footer{margin-top:30px;color:var(--muted);font-size:.8rem}
-</style></head><body><main>
-<header><div><h1>⚡ Trading HQ</h1><div class="muted">Your multi-market trading command centre</div></div><span class="pill">READ ONLY · LOCAL DATA</span></header>
-<section class="card" aria-labelledby="markets-heading">
-  <div class="flex"><h2 id="markets-heading">Gold &amp; oil</h2>
-    <a href="https://app.trading212.com/" target="_blank" rel="noopener noreferrer">Open Trading 212 for CFD positions</a>
-  </div>
-  <div class="two">
-    <div>
-      <h3>Gold · XAU/USD</h3>
-      <iframe class="market-chart" title="TradingView gold chart" src="https://s.tradingview.com/widgetembed/?symbol=OANDA%3AXAUUSD&amp;interval=15&amp;theme=dark&amp;hidesidetoolbar=1&amp;symboledit=0"></iframe>
-      <a href="https://www.tradingview.com/symbols/XAUUSD/?exchange=OANDA" target="_blank" rel="noopener noreferrer">Full gold chart</a>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#0d131d">
+<meta name="description" content="Trading HQ mobile workspace for Gold, WTI crude and Silver.">
+<title>Trading HQ · Commodity workspace</title>
+<link rel="stylesheet" href="styles.css">
+<script type="module" src="app.js"></script>
+</head>
+<body>
+<header class="top"><div class="shell top-inner">
+  <a class="brand" href="#markets"><span class="logo" aria-hidden="true"><svg viewBox="0 0 28 28" fill="none"><path d="m5 20 6-7 4 3 8-9M17 7h6v6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span> Trading <strong>HQ</strong></a>
+  <a class="broker" href="https://app.trading212.com/" target="_blank" rel="noopener">Trading 212 <span aria-hidden="true">↗</span></a>
+</div></header>
+<main class="shell">
+  <nav class="nav" aria-label="Workspace"><a href="#markets" aria-current="page">Markets</a><a href="#account">Account</a><a href="#setup">Setup</a></nav>
+  <section id="markets" class="page">
+    <div class="intro"><p class="eyebrow"><span></span> COMMODITIES DESK</p><h1>Market workspace</h1><p>Check the chart, set your levels, then size the trade.</p></div>
+    <div class="instruments" aria-label="Market selection">
+      <button type="button" data-market="gold" aria-pressed="true"><b>Gold</b><small>XAU/USD</small></button>
+      <button type="button" data-market="wti" aria-pressed="false"><b>WTI <span class="wide">crude</span></b><small>WTICO/USD</small></button>
+      <button type="button" data-market="silver" aria-pressed="false"><b>Silver</b><small>XAG/USD</small></button>
     </div>
-    <div>
-      <h3>WTI crude oil · WTICO/USD</h3>
-      <iframe class="market-chart" title="TradingView WTI crude oil chart" src="https://s.tradingview.com/widgetembed/?symbol=OANDA%3AWTICOUSD&amp;interval=15&amp;theme=dark&amp;hidesidetoolbar=1&amp;symboledit=0"></iframe>
-      <a href="https://www.tradingview.com/symbols/WTICOUSD/?exchange=OANDA" target="_blank" rel="noopener noreferrer">Full oil chart</a>
+    <div class="layout">
+      <section class="panel market-panel" aria-labelledby="market-name">
+        <div class="section-head"><div><p class="eyebrow">01 / MARKET</p><h2 id="market-name">Gold</h2></div><a class="quiet-link" id="full-chart" href="https://www.tradingview.com/symbols/XAUUSD/?exchange=OANDA" target="_blank" rel="noopener">Full chart ↗</a></div>
+        <div class="chart-tools"><div class="intervals" aria-label="Chart interval"><button type="button" data-interval="15" aria-pressed="true">15m</button><button type="button" data-interval="60" aria-pressed="false">1h</button><button type="button" data-interval="240" aria-pressed="false">4h</button></div><small>TradingView / OANDA</small></div>
+        <iframe class="chart" id="market-chart" title="TradingView Gold chart" allowfullscreen></iframe>
+        <p class="fine">Provider quotes may be delayed or unavailable. Match the exact instrument and price in Trading 212 before using the plan.</p>
+      </section>
+      <section class="panel decision" aria-labelledby="decision-title">
+        <div class="section-head"><div><p class="eyebrow">02 / DECISION</p><h2 id="decision-title">Buy or Wait</h2></div><span id="decision-tag" class="tag">WAIT</span></div>
+        <p id="decision-reason" aria-live="polite">Save an entry, stop and target first.</p>
+        <form id="price-form">
+          <label for="quote">Broker buy quote <small>Same instrument and currency as your plan</small></label>
+          <div class="input-action"><input id="quote" type="number" inputmode="decimal" min="0" step="any" placeholder="Enter current price" required><button class="button secondary">Check</button></div>
+        </form>
+        <p id="quote-status" class="fine">Manual check. The chart does not supply this number.</p>
+        <div class="separator"></div>
+        <form id="levels-form">
+          <label for="instrument">Your instrument <small>Use the Trading 212 name or ticker and quote currency</small></label>
+          <input id="instrument" type="text" maxlength="70" placeholder="e.g. Gold CFD · USD" required>
+          <div class="fields three">
+            <label>Entry <input id="entry" type="number" inputmode="decimal" min="0" step="any" required placeholder="—"></label>
+            <label>Stop <input id="stop" type="number" inputmode="decimal" min="0" step="any" required placeholder="—"></label>
+            <label>Target <input id="target" type="number" inputmode="decimal" min="0" step="any" required placeholder="—"></label>
+          </div>
+          <button class="button primary">Save levels</button>
+          <p class="fine feedback" id="level-status" role="status">Long setup. Levels are saved in this browser.</p>
+        </form>
+      </section>
     </div>
-  </div>
-  <p class="muted">Market charts use TradingView / OANDA data and may be delayed. Check Trading 212 for your broker quote. Gold and oil news alerts arrive separately in ChatGPT.</p>
-</section>
-<div class="notice">Refresh reloads the charts. Import a fresh Trading 212 CSV to update closed-trade results. Imports stay in this browser tab.</div>
-<section class="card"><h2>Import trading history</h2><div class="flex"><input id="csv" type="file" accept=".csv,text/csv"><button id="clear">Clear imported data</button></div><small id="status">No file imported. Historical results are not available yet.</small></section>
-<div class="grid"><div class="card"><h2>Real-time account balance</h2><div class="value">Unavailable</div><small>View live balance in Trading 212</small></div><div class="card"><h2>Closed-trade result</h2><div class="value" id="pnl">—</div><small id="pnlNote">Import CSV to calculate</small></div><div class="card"><h2>Closed positions</h2><div class="value" id="trades">—</div><small>Rows marked closed positions</small></div><div class="card"><h2>Win rate</h2><div class="value" id="win">—</div><small>Profitable closed positions / nonzero outcomes</small></div><div class="card"><h2>Open CFD positions</h2><div class="value">Unavailable</div><small>View current positions in Trading 212</small></div></div>
-<div class="two"><section class="card"><h2>Closed-trade performance</h2><canvas id="chart" width="600" height="220" aria-label="Cumulative closed-trade results chart"></canvas><small>Ordered by available transaction date. Does not include full account cash flows.</small></section><section class="card"><h2>Risk calculator</h2><div><label>Account equity (£) <input id="equity" type="number" min="0" step=".01" placeholder="e.g. 1000"></label><label>Risk (%) <input id="risk" type="number" min="0" max="100" step=".1" value="1"></label></div><div><label>Entry price <input id="entry" type="number" min="0" step="any"></label><label>Stop price <input id="stop" type="number" min="0" step="any"></label></div><p id="riskout">Enter equity, entry and stop to estimate risk and units.</p><small>Illustrative unit sizing only. CFDs require contract size, currency conversion, margin and slippage checks.</small></section></div>
-<div class="two"><section class="card"><h2>Watchlist</h2><div><label>Symbol <input id="symbol" type="text" placeholder="XAUUSD"></label><label>Asset <select id="asset"><option>Share</option><option>ETF / ETC</option><option>Commodity</option><option>Index</option><option>FX</option><option>Crypto</option></select></label><button id="add">Add</button></div><div class="scroll"><table><thead><tr><th>Symbol</th><th>Market</th><th>Action</th></tr></thead><tbody id="watch"></tbody></table></div><small>Saved on this device only. No live quotes.</small></section><section class="card"><h2>Saved price levels</h2><div><label>Symbol <input id="alertsymbol" type="text" placeholder="XAUUSD"></label><label>Target <input id="target" type="number" step="any"></label><button id="addalert">Add</button></div><div id="alerts" class="muted">No levels added.</div><small>Planning reminders only. No background monitoring, push notifications or price feed.</small></section></div>
-<section class="card"><div class="flex"><h2>Trade journal / imported closed positions</h2><label>Search <input id="filter" type="text" placeholder="Instrument or action"></label></div><div class="scroll"><table><thead><tr><th>Date</th><th>Instrument</th><th>Action</th><th>Result</th></tr></thead><tbody id="journal"><tr><td colspan="4" class="muted">Import a CSV to populate this journal.</td></tr></tbody></table></div><small id="count"></small></section>
-<footer>Trading HQ v1 · No order execution · Historical performance is not a forecast. Export files may omit financing, fees, deposits, withdrawals or open positions. Verify results against broker statements.</footer>
-</main><script>
-const $=id=>document.getElementById(id);let closed=[];const money=n=>(n<0?'-':'')+'£'+Math.abs(n).toLocaleString('en-GB',{minimumFractionDigits:2,maximumFractionDigits:2});
-function parseCSV(s){const out=[];let row=[],cell='',quote=false;for(let i=0;i<s.length;i++){let c=s[i];if(c==='"'){if(quote&&s[i+1]==='"'){cell+='"';i++}else quote=!quote}else if(c===','&&!quote){row.push(cell);cell=''}else if((c==='\n'||c==='\r')&&!quote){if(c==='\r'&&s[i+1]==='\n')i++;row.push(cell);if(row.some(x=>x.trim()))out.push(row);row=[];cell=''}else cell+=c}row.push(cell);if(row.some(x=>x.trim()))out.push(row);return out}
-function num(s){if(s==null||String(s).trim()==='')return NaN;let v=String(s).replace(/[£$€,\s]/g,'');if(/^\(.*\)$/.test(v))v='-'+v.slice(1,-1);return Number(v)}
-function draw(){const c=$('chart'),g=c.getContext('2d'),w=c.width,h=c.height;g.clearRect(0,0,w,h);g.strokeStyle='#30475d';g.beginPath();g.moveTo(42,10);g.lineTo(42,h-25);g.lineTo(w-12,h-25);g.stroke();if(!closed.length)return;let sum=0,pts=[0];for(const x of closed)pts.push(sum+=x.pnl);let lo=Math.min(...pts,0),hi=Math.max(...pts,0);if(lo===hi){lo-=1;hi+=1}g.strokeStyle='#6bd2fa';g.lineWidth=2;g.beginPath();pts.forEach((v,i)=>{let x=42+i/Math.max(1,pts.length-1)*(w-55),y=10+(hi-v)/(hi-lo)*(h-35);i?g.lineTo(x,y):g.moveTo(x,y)});g.stroke();g.fillStyle='#a6b5c8';g.font='12px sans-serif';g.fillText(money(hi),45,12);g.fillText(money(lo),45,h-30)}
-function render(){let pnl=closed.reduce((a,x)=>a+x.pnl,0),wins=closed.filter(x=>x.pnl>0).length,nonzero=closed.filter(x=>x.pnl!==0).length;$('pnl').textContent=closed.length?money(pnl):'—';$('pnl').className='value '+(pnl<0?'bad':'good');$('trades').textContent=closed.length||'—';$('win').textContent=nonzero?(100*wins/nonzero).toFixed(1)+'%':'—';draw();let q=$('filter').value.toLowerCase();let matches=closed.filter(x=>(x.instrument+' '+x.action).toLowerCase().includes(q));$('journal').innerHTML=matches.slice(-150).reverse().map(x=>'<tr><td>'+esc(x.date)+'</td><td>'+esc(x.instrument)+'</td><td>'+esc(x.action)+'</td><td class="'+(x.pnl<0?'bad':'good')+'">'+money(x.pnl)+'</td></tr>').join('')||'<tr><td colspan="4">No matching closed positions</td></tr>';$('count').textContent=matches.length+' matching records; showing latest 150.'}
-function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
-let importRequest = 0;
-$('csv').addEventListener('change', async e => {
-  const file = e.target.files[0];
-  if (!file) return;
-  const request = ++importRequest;
-  try {
-    const rows = parseCSV((await file.text()).replace(/^\uFEFF/, ''));
-    if (request !== importRequest) return;
-    const headers = (rows.shift() || []).map(value => value.trim().toLowerCase());
-    const index = (...names) => names.map(name => headers.indexOf(name)).find(i => i >= 0) ?? -1;
-    const recordType = index('record type');
-    const isCFD = recordType >= 0;
-    const action = isCFD ? recordType : index('action', 'type');
-    const result = isCFD
-      ? index('total result (account currency)')
-      : index('result (gbp)', 'result', 'p/l (gbp)', 'profit/loss', 'profit / loss', 'realised p/l', 'realized p/l');
-    const currency = index('account currency');
-    const instrument = index('instrument', 'name', 'ticker', 'symbol');
-    const date = isCFD ? index('date closed (utc)') : index('time', 'date', 'created on', 'execution time');
-    if (action < 0 || result < 0 || (isCFD && currency < 0)) {
-      throw Error('Please choose a Trading 212 history CSV with closed-position results.');
-    }
-    const positions = rows.filter(row => /position closed|close position|closed position/i.test(row[action] || ''));
-    if (isCFD && positions.some(row => row[currency]?.trim().toUpperCase() !== 'GBP')) {
-      throw Error('This dashboard displays GBP and requires a GBP account export.');
-    }
-    closed = positions.map(row => ({
-      date: row[date] || '',
-      instrument: row[instrument] || 'Unknown',
-      action: row[action] || '',
-      pnl: num(row[result])
-    })).filter(position => Number.isFinite(position.pnl));
-    const dateValue = value => {
-      if (!isCFD) return Date.parse(value);
-      const timestamp = value.trim().replace(' ', 'T');
-      return Date.parse(/[Zz]$|[+-]\d{2}:?\d{2}$/.test(timestamp) ? timestamp : timestamp + 'Z');
-    };
-    closed.sort((a, b) => {
-      const aTime = dateValue(a.date);
-      const bTime = dateValue(b.date);
-      return Number.isFinite(aTime) && Number.isFinite(bTime) ? aTime - bTime : 0;
-    });
-    const skipped = positions.length - closed.length;
-    $('status').textContent = file.name + ' · ' + rows.length + ' records · ' + closed.length +
-      ' closed positions imported.' + (skipped ? ' Skipped ' + skipped + ' with missing or invalid results.' : '');
-    $('pnlNote').textContent = isCFD ? 'Sum of Total result for closed positions in GBP' : 'Sum of imported closed-position result column';
-    render();
-  } catch (error) {
-    if (request !== importRequest) return;
-    closed = [];
-    $('pnlNote').textContent = 'Import CSV to calculate';
-    render();
-    $('status').textContent = 'Import error: ' + error.message;
-  }
-});
-$('clear').onclick=()=>{importRequest++;closed=[];$('pnlNote').textContent='Import CSV to calculate';$('csv').value='';$('status').textContent='Imported data cleared.';render()};$('filter').oninput=render;
-function risk(){let e=num($('equity').value),p=num($('risk').value),a=num($('entry').value),b=num($('stop').value);if(!Number.isFinite(e)||e<=0||!Number.isFinite(p)||p<=0||!Number.isFinite(a)||!Number.isFinite(b)||a===b){$('riskout').textContent='Enter positive equity and risk, plus different entry and stop prices.';return}let cash=e*p/100;$('riskout').textContent='Maximum planned risk: '+money(cash)+' · Indicative units: '+(cash/Math.abs(a-b)).toFixed(4)}['equity','risk','entry','stop'].forEach(id=>$(id).oninput=risk);
-const key='tradinghq-v1-watch',akey='tradinghq-v1-alerts';function read(k){try{return JSON.parse(localStorage.getItem(k)||'[]')}catch{return []}}function save(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch{}}let watch=read(key),alerts=read(akey);function renderWatch(){$('watch').innerHTML=watch.map((x,i)=>'<tr><td>'+esc(x.symbol)+'</td><td>'+esc(x.asset)+'</td><td><button data-i="'+i+'">Remove</button></td></tr>').join('')||'<tr><td colspan="3">No instruments added</td></tr>';document.querySelectorAll('#watch button').forEach(b=>b.onclick=()=>{watch.splice(+b.dataset.i,1);save(key,watch);renderWatch()})}function renderAlerts(){$('alerts').innerHTML=alerts.map((x,i)=>'<p>'+esc(x.symbol)+' · '+esc(x.target)+' <button data-i="'+i+'">Remove</button></p>').join('')||'No levels added.';document.querySelectorAll('#alerts button').forEach(b=>b.onclick=()=>{alerts.splice(+b.dataset.i,1);save(akey,alerts);renderAlerts()})}
-$('add').onclick=()=>{let symbol=$('symbol').value.trim().toUpperCase();if(!symbol)return;watch.push({symbol,asset:$('asset').value});save(key,watch);$('symbol').value='';renderWatch()};$('addalert').onclick=()=>{let symbol=$('alertsymbol').value.trim().toUpperCase(),target=num($('target').value);if(!symbol||!Number.isFinite(target))return;alerts.push({symbol,target});save(akey,alerts);$('alertsymbol').value='';$('target').value='';renderAlerts()};renderWatch();renderAlerts();draw();
-</script></body></html>
+    <details class="panel risk" id="risk-panel">
+      <summary><span><span class="eyebrow">03 / RISK</span><strong>Risk &amp; position size</strong></span></summary>
+      <form id="risk-form">
+        <p>Uses the saved entry and stop. Enter the broker’s value in pounds for a 1.00 price move on one order unit.</p>
+        <div class="fields two">
+          <label>Account equity (£)<input type="number" inputmode="decimal" id="equity" min="0" step="any" required></label>
+          <label>Risk limit (%)<input type="number" inputmode="decimal" id="risk" min="0" max="100" step="any" required></label>
+          <label>£ per point per unit<input type="number" inputmode="decimal" id="point" min="0" step="any" required></label>
+          <label>Order size increment<input type="number" inputmode="decimal" id="step" min="0" step="any" required></label>
+          <label>Broker minimum size<input type="number" inputmode="decimal" id="minimum" min="0" step="any" required></label>
+          <label>Planned units <small>Optional</small><input type="number" inputmode="decimal" id="units" min="0" step="any"></label>
+        </div>
+        <button class="button primary">Calculate</button>
+        <p id="risk-result" class="output" role="status">Save a plan and enter the broker’s contract details to check size.</p>
+        <p class="fine">Estimates exclude spread, fees, financing and slippage. Check broker margin before trading. Stops can fill at a worse price.</p>
+      </form>
+    </details>
+  </section>
+  <section id="account" class="page" hidden>
+    <div class="intro"><p class="eyebrow"><span></span> TRADING 212</p><h1>Account &amp; positions</h1><p>Review a CSV snapshot or check current figures in the broker app.</p></div>
+    <section class="panel">
+      <div class="section-head"><div><p class="eyebrow">CSV / PRIVATE TO THIS TAB</p><h2>Import Trading 212 CSV</h2></div><span class="tag neutral">FILE SNAPSHOT</span></div>
+      <p>In Trading 212, tap Menu → History → Export. A standard CFD CSV includes closed activity. Check the broker for your current balance and positions.</p>
+      <div class="actions"><label class="button primary file-button">Choose CSV<input id="csv-file" type="file" accept=".csv,text/csv"></label><button type="button" id="clear-csv" class="button secondary">Clear import</button></div>
+      <p id="csv-status" class="fine feedback" role="status">No file imported. Your file stays in this tab.</p>
+      <div class="snapshots">
+        <div><small>Reported balance</small><strong id="account-balance">—</strong><p id="balance-note">Available when explicitly included in the file.</p></div>
+        <div><small>Reported open positions</small><strong id="account-open">—</strong><p id="open-note">Available when explicitly included in the file.</p></div>
+        <div><small>Closed positions</small><strong id="account-closed">—</strong><p>History from the selected export period.</p></div>
+      </div>
+      <div id="open-list"></div>
+      <button type="button" id="use-balance" class="button secondary" hidden>Copy GBP balance to risk form</button>
+      <details id="import-journal" hidden><summary>Closed trade journal <span id="closed-summary"></span></summary><label>Filter by instrument<input id="journal-filter" type="search" placeholder="e.g. Gold"></label><div id="journal-list"></div></details>
+    </section>
+    <section class="panel compact"><h2>Existing Trading HQ tools</h2><p>Use the original performance chart, journal and custom watchlist.</p><a class="quiet-link" href="workflow.html">Open existing tools →</a><p class="fine">Older watchlists and levels stay on the browser and address where you saved them. Your existing GitHub Pages shortcut still opens those tools.</p></section>
+  </section>
+  <section id="setup" class="page" hidden>
+    <div class="intro"><p class="eyebrow"><span></span> QUICK START</p><h1>Set up Trading HQ</h1><p>Three steps for your first phone session.</p></div>
+    <div class="layout setup-layout">
+      <section class="panel">
+        <h2>First session</h2>
+        <ol class="steps">
+          <li><div><b>Pick a market</b><p>Check the chart on 15m, 1h or 4h. Match your broker symbol.</p><a href="#markets">Open Markets →</a></div></li>
+          <li><div><b>Import account history</b><p>Choose your Trading 212 CSV. Check the broker for fields missing from the export.</p><a href="#account">Open Account →</a></div></li>
+          <li><div><b>Save a plan and check risk</b><p>Enter your instrument, entry, stop and target. Check the broker quote, then calculate size.</p><a href="#markets">Open your plan →</a></div></li>
+        </ol>
+        <details><summary>Move saved levels between browsers</summary><p>Download your plan file on the old browser or host. Open it here to replace the plans in this browser. CSVs are excluded.</p><div class="actions"><button type="button" id="export-plans" class="button secondary">Download plans</button><label class="button secondary file-button">Import plans<input type="file" id="import-plans" accept=".json,application/json"></label></div><p id="transfer-status" class="fine feedback" role="status"></p></details>
+      </section>
+      <section class="panel">
+        <h2>Connection status</h2>
+        <ul class="statuses">
+          <li><b>Charts</b><span>TradingView embed</span><p>Quote timing and availability depend on the provider.</p></li>
+          <li><b>Balance &amp; CFD positions</b><span>CSV / broker app</span><p>Current figures are available in Trading 212. Its public API supports Invest and Stocks ISA accounts.</p></li>
+          <li><b>Background alerts</b><span>Service needed</span><p>Saved levels are manual. Your ChatGPT commodity alerts are separate.</p></li>
+          <li><b>News feed</b><span>Service needed</span><p>A licensed feed and timestamped headlines would appear here.</p></li>
+        </ul>
+      </section>
+    </div>
+    <section class="panel upgrade">
+      <div class="section-head"><div><p class="eyebrow">EXISTING REPOSITORY / MAIN</p><h2>Upgrade checklist</h2></div><a class="quiet-link" href="https://github.com/welshescape-tech/trading-hq-live" target="_blank" rel="noopener">GitHub ↗</a></div>
+      <ol class="steps">
+        <li><div><b>P0 · Review and merge the workspace</b><p><code>index.html</code> is the Pages entry. <code>styles.css</code> and <code>app.js</code> power the mobile view. <code>workflow.html</code> keeps the original tools. Keep Pages on <code>main / (root)</code> for the phone shortcut.</p></div></li>
+        <li><div><b>P0 · Verify a fresh CSV</b><p><code>trading-core.js</code> reads the export. Supported snapshot columns are listed in <code>README.md</code>. Check history and any explicitly reported balance or open positions against the broker.</p></div></li>
+        <li><div><b>P1 · Connect a licensed quote source</b><p>Proposed <code>services/quotes.js</code> for a server-side feed. Keep source and timestamp labels in <code>app.js</code>.</p></div></li>
+        <li><div><b>P2 · Add alerts and news services</b><p>Proposed <code>services/alerts.js</code> and <code>services/news.js</code>. Set up hosting, delivery and feed licensing before enabling either.</p></div></li>
+      </ol>
+      <p class="fine"><a href="https://helpcentre.trading212.com/hc/en-us/articles/36243765206301-How-to-export-the-trading-data-from-my-CFD-account" target="_blank" rel="noopener">Trading 212 CSV guide ↗</a> · <a href="https://docs.trading212.com/api/section/general-information/only-for-invest-and-stocks-isa" target="_blank" rel="noopener">API account support ↗</a></p>
+      <a class="quiet-link" href="https://welshescape-tech.github.io/trading-hq-live/" target="_blank" rel="noopener">Existing phone shortcut ↗</a>
+    </section>
+  </section>
+</main>
+<footer class="shell"><span>TRADING HQ</span><span>Planning workspace · No order execution</span></footer>
+</body>
+</html>
